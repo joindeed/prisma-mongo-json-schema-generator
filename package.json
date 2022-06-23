@@ -1,31 +1,27 @@
 {
-    "name": "prisma-json-schema-generator",
+    "name": "prisma-mongo-json-schema-generator",
     "version": "2.0.17",
     "main": "dist/index.js",
     "license": "MIT",
     "files": [
         "dist"
     ],
-    "description": "JSON generator for prisma schema",
-    "author": {
-        "name": "Valentin Palkovic",
-        "email": "dev@valentinpalkovic.dev"
-    },
+    "description": "Mongo-flavored JSON generator for Prisma schema",
     "keywords": [
         "prisma2",
         "prisma",
         "prisma-generator",
         "prisma-schema",
         "code-generation",
-        "json"
+        "json",
+        "mongodb"
     ],
-    "homepage": "https://github.com/valentinpalkovic/prisma-json-schema-generator",
+    "homepage": "https://github.com/joindeed/prisma-mongo-json-schema-generator",
     "repository": {
-        "url": "https://github.com/valentinpalkovic/prisma-json-schema-generator.git"
+        "url": "https://github.com/joindeed/prisma-mongo-json-schema-generator.git"
     },
     "bugs": {
-        "email": "bugs@valentinpalkovic.dev",
-        "url": "https://github.com/valentinpalkovic/prisma-json-schema-generator/issues"
+        "url": "https://github.com/joindeed/prisma-mongo-json-schema-generator/issues"
     },
     "dependencies": {
         "@prisma/generator-helper": "3.15.2",
@@ -79,6 +75,6 @@
         "trailingComma": "all"
     },
     "bin": {
-        "prisma-json-schema-generator": "dist/cli.js"
+        "prisma-mongo-json-schema-generator": "dist/cli.js"
     }
 }
