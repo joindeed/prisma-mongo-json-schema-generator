@@ -1,57 +1,81 @@
 import type { DMMF } from '@prisma/generator-helper'
-import type { JSONSchema7, JSONSchema7Definition } from 'json-schema'
-import { TransformOptions } from './types'
-import { DEFINITIONS_ROOT } from './constants'
+import type { JSONSchema4 } from 'json-schema'
 import { toCamelCase } from './helpers'
 
 import { getInitialJSON } from './jsonSchema'
 import { getJSONSchemaModel } from './model'
 
-function getPropertyDefinition({ schemaId }: TransformOptions) {
-    return (
-        model: DMMF.Model,
-    ): [name: string, reference: JSONSchema7Definition] => {
-        const ref = `${DEFINITIONS_ROOT}${model.name}`
-        return [
-            toCamelCase(model.name),
-            {
-                $ref: schemaId ? `${schemaId}${ref}` : ref,
-            },
-        ]
+const isObject = (obj: unknown): boolean =>
+    Boolean(obj && typeof obj === 'object' && !Array.isArray(obj))
+
+// @TODO-DP: not time for proper typing of this now, sorry
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+const expandRefs = (
+    definitions: Record<string, JSONSchema4>,
+    obj: any,
+): void => {
+    if (!isObject(obj)) {
+        return
+    }
+    Object.keys(obj).forEach((key) => {
+        if (Array.isArray(obj[key])) {
+            obj[key].forEach((item: any, index: number) => {
+                if (isObject(item) && item.$ref) {
+                    obj[key][index] = definitions[item.$ref]
+                } else {
+                    expandRefs(definitions, item)
+                }
+            })
+        } else if (isObject(obj[key])) {
+            const ref = obj[key].$ref
+            if (ref) {
+                obj[key] = definitions[ref]
+            } else {
+                expandRefs(definitions, obj[key])
+            }
+        }
+    })
+}
+/* eslint-enable @typescript-eslint/no-unsafe-assignment */
+/* eslint-enable @typescript-eslint/no-unsafe-argument */
+/* eslint-enable @typescript-eslint/no-unsafe-member-access */
+/* eslint-enable @typescript-eslint/no-unsafe-call */
+
+function getPropertyDefinition({
+    definitions,
+}: {
+    definitions: Record<string, JSONSchema4>
+}) {
+    return (model: DMMF.Model): [name: string, reference: JSONSchema4] => {
+        return [toCamelCase(model.name), definitions?.[model.name]]
     }
 }
 
-export function transformDMMF(
-    dmmf: DMMF.Document,
-    transformOptions: TransformOptions = {},
-): JSONSchema7 {
+export function transformDMMF(dmmf: DMMF.Document): JSONSchema4 {
     // TODO: Remove default values as soon as prisma version < 3.10.0 doesn't have to be supported anymore
     const { models = [], enums = [], types = [] } = dmmf.datamodel
     const initialJSON = getInitialJSON()
-    const { schemaId } = transformOptions
 
-    const modelDefinitionsMap = models.map(
-        getJSONSchemaModel({ enums }, transformOptions),
-    )
+    const modelDefinitionsMap = models.map(getJSONSchemaModel({ enums }))
 
-    const typeDefinitionsMap = types.map(
-        getJSONSchemaModel({ enums }, transformOptions),
-    )
-
-    const modelPropertyDefinitionsMap = models.map(
-        getPropertyDefinition(transformOptions),
-    )
+    const typeDefinitionsMap = types.map(getJSONSchemaModel({ enums }))
     const definitions = Object.fromEntries([
         ...modelDefinitionsMap,
         ...typeDefinitionsMap,
     ])
+    expandRefs(definitions, definitions)
+
+    const modelPropertyDefinitionsMap = models.map(
+        getPropertyDefinition({ definitions }),
+    )
 
     const properties = Object.fromEntries(modelPropertyDefinitionsMap)
 
     return {
-        ...(schemaId ? { $id: schemaId } : null),
         ...initialJSON,
-        definitions,
         properties,
     }
 }

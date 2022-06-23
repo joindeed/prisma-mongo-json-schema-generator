@@ -1,5 +1,5 @@
 import { DMMF } from '@prisma/generator-helper'
-import { JSONSchema7Definition } from 'json-schema'
+import { JSONSchema4 } from 'json-schema'
 
 export interface PropertyMetaData {
     required: boolean
@@ -7,12 +7,8 @@ export interface PropertyMetaData {
 
 export interface ModelMetaData {
     enums: DMMF.DatamodelEnum[]
+    definitions?: Record<string, JSONSchema4>
 }
 
-export type DefinitionMap = [name: string, definition: JSONSchema7Definition]
+export type DefinitionMap = [name: string, definition: JSONSchema4]
 export type PropertyMap = [...DefinitionMap, PropertyMetaData]
-
-export interface TransformOptions {
-    keepRelationScalarFields?: 'true' | 'false'
-    schemaId?: string
-}
