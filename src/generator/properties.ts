@@ -39,13 +39,18 @@ function getJSONSchemaScalar(
 
 function getJSONSchemaType(field: DMMF.Field): JSONSchema4['bsonType'] {
     const { isList } = field
+    const isObjectId = field.documentation?.includes('@db.ObjectId')
     const scalarFieldType =
         isScalarType(field) && !isList
-            ? getJSONSchemaScalar(field.type)
+            ? isObjectId
+                ? 'objectId'
+                : getJSONSchemaScalar(field.type)
             : field.isList
             ? 'array'
             : isEnumType(field)
-            ? 'string'
+            ? isObjectId
+                ? 'objectId'
+                : 'string'
             : 'object'
 
     return scalarFieldType
@@ -61,10 +66,15 @@ function getJSONSchemaForPropertyReference(field: DMMF.Field): JSONSchema4 {
 }
 
 function getItemsByDMMFType(field: DMMF.Field): JSONSchema4['items'] {
+    const isObjectId = field.documentation?.includes('@db.ObjectId')
     return (isScalarType(field) && !field.isList) || isEnumType(field)
         ? undefined
         : isScalarType(field) && field.isList
-        ? { bsonType: getJSONSchemaScalar(field.type) }
+        ? {
+              bsonType: isObjectId
+                  ? 'objectId'
+                  : getJSONSchemaScalar(field.type),
+          }
         : getJSONSchemaForPropertyReference(field)
 }
 
@@ -116,6 +126,9 @@ export function getJSONSchemaProperty(modelMetaData: ModelMetaData) {
             ? getJSONSchemaForPropertyReference(field)
             : getPropertyDefinition(modelMetaData, field)
 
-        return [field.name, property, propertyMetaData]
+        const fieldName = field.documentation?.includes('@map(')
+            ? field.documentation.match(/@map\("(.+)"\)/)?.[1] || field.name
+            : field.name
+        return [fieldName, property, propertyMetaData]
     }
 }

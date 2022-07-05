@@ -58,6 +58,9 @@
         "semantic-release": "19.0.3",
         "typescript": "4.7.4"
     },
+    "peerDependencies": {
+        "mongodb": "*"
+    },
     "scripts": {
         "generate": "prisma generate",
         "clean": "rm -rf dist",
@@ -75,6 +78,8 @@
         "trailingComma": "all"
     },
     "bin": {
-        "prisma-mongo-json-schema-generator": "dist/cli.js"
+        "prisma-mongo-json-schema-generator": "dist/cli.js",
+        "prisma-mongo-json-schema-generator-apply": "dist/apply.js",
+        "prisma-mongo-json-schema-generator-verify": "dist/verify.js"
     }
 }

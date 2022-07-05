@@ -50,7 +50,10 @@ function getPropertyDefinition({
     definitions: Record<string, JSONSchema4>
 }) {
     return (model: DMMF.Model): [name: string, reference: JSONSchema4] => {
-        return [toCamelCase(model.name), definitions?.[model.name]]
+        return [
+            model.dbName || toCamelCase(model.name),
+            definitions?.[model.name],
+        ]
     }
 }
 
