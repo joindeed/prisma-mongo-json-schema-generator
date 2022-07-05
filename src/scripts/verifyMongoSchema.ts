@@ -1,13 +1,14 @@
 import { MongoClient } from 'mongodb'
+import { getConfig } from './getConfig'
 
 export const verifyMongoSchema = async (schema: {
     properties: Record<string, unknown>
 }) => {
-    const uri = process.env.MONGO_URI || 'mongodb://localhost:27017/'
-    const client = new MongoClient(uri)
+    const { mongoUri, mongoDb } = getConfig()
+    const client = new MongoClient(mongoUri)
     try {
         await client.connect()
-        const database = client.db(process.env.MONGO_DB)
+        const database = client.db(mongoDb)
         await Promise.all(
             Object.keys(schema.properties).map(async (collectionName) => {
                 try {
