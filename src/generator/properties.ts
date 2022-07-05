@@ -117,7 +117,10 @@ function getPropertyDefinition(
 }
 
 export function getJSONSchemaProperty(modelMetaData: ModelMetaData) {
-    return (field: DMMF.Field): PropertyMap => {
+    return (field: DMMF.Field): PropertyMap | null => {
+        if (field.documentation?.includes('@MongoSchema.omit')) {
+            return null
+        }
         const propertyMetaData: PropertyMetaData = {
             required: field.isRequired,
         }

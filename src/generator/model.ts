@@ -1,17 +1,26 @@
 import { DMMF } from '@prisma/generator-helper'
 import { JSONSchema4 } from 'json-schema'
 import { getJSONSchemaProperty } from './properties'
-import { DefinitionMap, ModelMetaData } from './types'
+import { DefinitionMap, ModelMetaData, PropertyMap } from './types'
 
 function getRelationFields(model: DMMF.Model): string[] {
     return model.fields
-        .map((field) => (field.relationName ? field.name : ''))
+        .map((field) =>
+            field.relationName &&
+            !field.documentation?.includes('@MongoSchema.omit')
+                ? field.name
+                : '',
+        )
         .filter(Boolean)
 }
 function getRequiredFields(model: DMMF.Model): string[] {
     return model.fields
         .map((field) =>
-            !field.relationName && field.isRequired ? field.name : '',
+            !field.relationName &&
+            field.isRequired &&
+            !field.documentation?.includes('@MongoSchema.omit')
+                ? field.name
+                : '',
         )
         .filter(Boolean)
         .filter((field) => field !== 'id')
@@ -19,9 +28,9 @@ function getRequiredFields(model: DMMF.Model): string[] {
 
 export function getJSONSchemaModel(modelMetaData: ModelMetaData) {
     return (model: DMMF.Model): DefinitionMap => {
-        const definitionPropsMap = model.fields.map(
-            getJSONSchemaProperty(modelMetaData),
-        )
+        const definitionPropsMap = model.fields
+            .map(getJSONSchemaProperty(modelMetaData))
+            .filter((item: unknown): item is PropertyMap => Boolean(item))
 
         const propertiesMap = definitionPropsMap.map(
             ([name, definition]) => [name, definition] as DefinitionMap,
