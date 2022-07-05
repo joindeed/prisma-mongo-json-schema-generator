@@ -40,6 +40,15 @@ Env variables:
 | VALIDATION_LEVEL | `strict` |
 | VALIDATION_ACTION | `error` |
 
+If you want to omit some property from being included in the schema, add `@MongoSchema.omit` to its documentation in the Prisma schema:
+
+```
+model SomeModel {
+  /// @MongoSchema.omit
+  someProperty String
+}
+```
+
 **3. Validate collections according to the schema**
 
 ```shell
