@@ -21,16 +21,14 @@ export const getConfig = () => {
         prismaSchemaPathResolved,
         'json-schema.json',
     )
-    const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/'
-    const mongoDb = process.env.MONGO_DB
-    if (!mongoDb) {
-        throw new Error('MONGO_DB env var must be set!')
+    const mongoUri = process.env.MONGO_URI
+    if (!mongoUri) {
+        throw new Error('MONGO_URI env var must be set!')
     }
     return {
         originalPrismaSchemaPath,
         processedPrismaSchemaPath,
         jsonSchemaPath,
         mongoUri,
-        mongoDb,
     }
 }

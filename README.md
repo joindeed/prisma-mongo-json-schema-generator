@@ -1,6 +1,9 @@
 # Prisma Mongo JSON Schema Generator
 
-A generator, which takes a Prisma 2 `schema.prisma` and generates a JSON Schema in flavor which MongoDB accepts (https://www.mongodb.com/docs/manual/reference/operator/query/jsonSchema/#std-label-jsonSchema-extension).
+This package contains two things:
+
+- A generator, which takes a Prisma 2 `schema.prisma` and generates a JSON Schema in flavor which MongoDB accepts (https://www.mongodb.com/docs/manual/reference/operator/query/jsonSchema/#std-label-jsonSchema-extension).
+- A set of scripts to apply the generated schema to MongoDB collections and to validate the data accordingly
 
 ## Credit
 
@@ -22,41 +25,23 @@ yarn:
 yarn add -D prisma-mongo-json-schema-generator
 ```
 
-**2. Add the generator to the schema**
-
-```prisma
-generator jsonSchema {
-  provider = "prisma-mongo-json-schema-generator"
-}
-```
-
-With a custom output path (default=./json-schema)
-
-```prisma
-generator jsonSchema {
-  provider = "prisma-mongo-json-schema-generator"
-  output = "custom-output-path"
-}
-```                                                                                                                      |
-
-**3. Run generation**
-
-prisma:
+**2. Apply the schema to database**
 
 ```shell
-prisma generate
+PRISMA_SCHEMA_FILE=prisma/prisma.schema MONGO_URI=mongodb://localhost:27017/your-database yarn prisma-mongo-json-schema-generator-apply
 ```
 
-nexus with prisma plugin:
+Env variables:
+
+| Env name | Default value |
+|--|--|
+| MONGO_URI | required |
+| PRISMA_SCHEMA_FILE | `prisma/prisma.schema` |
+| VALIDATION_LEVEL | `strict` |
+| VALIDATION_ACTION | `error` |
+
+**3. Validate collections according to the schema**
 
 ```shell
-nexus build
+PRISMA_SCHEMA_FILE=prisma/prisma.schema MONGO_URI=mongodb://localhost:27017/your-database yarn prisma-mongo-json-schema-generator-validate
 ```
-
-## Supported Node Versions
-
-|         Node Version | Support            |
-| -------------------: | :----------------- |
-| (Maintenance LTS) 14 | :heavy_check_mark: |
-|          (Active) 16 | :heavy_check_mark: |
-|         (Current) 17 | :heavy_check_mark: |
