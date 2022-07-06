@@ -8,18 +8,9 @@ This package contains two things:
 
 ## Why?
 
-Prisma has been originally designed to work with relational databases that have rigid schema structure.
-Now when Prisma is matched with MongoDB, which is originally a schema-free database, we encounter an impedence mismatch: Prisma expects data inside the DB to be exactly matching the schema and throws when trying to touch (even read!) the data that is at least slightly off, but we have no way to assert the data validity on the database level.
+Because Prisma would blow up at the very wrong moment if the underlying data is invalid. Read this thread to understand the problem better:
 
-So if you have some legacy data, or some of the admins edit the data directly, or if you have some legacy system directly modifying the data via e.g. Mongoose, you are in big trouble, any slight deviation of data would cause Prisma to throw!
-
-Or you may be testing a feature in development environment, everything going smooth, until it explodes in production with P1012 error because you forgot to migrate some database values.
-
-So that's where this package comes in. It allows you to **generate a JSON schema from your Prisma schema file and apply it automatically to all collections in your database**.
-After that, it would be impossible to insert invalid data into the collection: neither via direct modification in e.g. Compass, nor via accessing it via Mongoose etc.
-
-It would make sense to apply the new schema to collections automatically via a CI script on merge to the right branch.
-Also probably you would want to run the validation script e.g. daily in CI.
+[<img width="450" alt="image" src="https://user-images.githubusercontent.com/837032/177534260-79b588e1-7dac-47be-96cc-3478fa9943d4.png">](https://twitter.com/dimaip/status/1544632203052589056)
 
 ## Credit
 
