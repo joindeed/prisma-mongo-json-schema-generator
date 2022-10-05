@@ -38,6 +38,8 @@ yarn add -D prisma-mongo-json-schema-generator
 PRISMA_SCHEMA_FILE=prisma/prisma.schema MONGO_URI=mongodb://localhost:27017/your-database yarn prisma-mongo-json-schema-generator-apply
 ```
 
+If you are getting `AuthenticationFailed` errors, make sure that you are specifying the correct auth database by using the `authSource` query parameter (ex: `authSource=admin`).
+
 The package is configurable via environment variables:
 
 | Env name | Default value |
@@ -59,5 +61,5 @@ model SomeModel {
 **3. Validate collections according to the schema**
 
 ```shell
-PRISMA_SCHEMA_FILE=prisma/prisma.schema MONGO_URI=mongodb://localhost:27017/your-database yarn prisma-mongo-json-schema-generator-validate
+PRISMA_SCHEMA_FILE=prisma/prisma.schema MONGO_URI=mongodb://localhost:27017/your-database yarn prisma-mongo-json-schema-generator-verify
 ```
